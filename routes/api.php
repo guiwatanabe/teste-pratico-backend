@@ -27,4 +27,5 @@ Route::middleware('auth:sanctum')->prefix('products')->group(function () {
 
 Route::middleware('auth:sanctum')->prefix('clients')->group(function () {
     Route::get('/', [ClientController::class, 'index'])->can('viewAny', App\Models\Client::class);
+    Route::get('/{client}', [ClientController::class, 'show'])->can('view', 'client');
 });

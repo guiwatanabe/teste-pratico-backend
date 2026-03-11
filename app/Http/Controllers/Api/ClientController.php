@@ -12,4 +12,9 @@ class ClientController extends Controller
     {
         return ClientResource::collection(Client::paginate(10));
     }
+
+    public function show(Client $client)
+    {
+        return new ClientResource($client->load('transactions.products'));
+    }
 }
