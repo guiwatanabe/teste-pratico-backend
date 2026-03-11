@@ -73,3 +73,18 @@ test('returns 422 when email is already taken', function () {
         'role'     => 'USER',
     ])->assertStatus(422);
 });
+
+test('persists created user to database', function () {
+    $adminUser = \App\Models\User::factory()->create(['role' => 'ADMIN']);
+
+    $response = $this->actingAs($adminUser)->postJson('/api/users', [
+        'name'     => 'New User',
+        'email'    => 'newuser@example.com',
+        'password' => 'password',
+        'role'     => 'USER',
+    ])->assertStatus(201);
+
+    $this->assertDatabaseHas('users', [
+        'email' => 'newuser@example.com',
+    ]);
+});

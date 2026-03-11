@@ -35,6 +35,14 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
+        if ($user->role === 'ADMIN') {
+            return true;
+        }
+
+        if ($user->role === 'MANAGER') {
+            return $model->role === 'USER';
+        }
+
         return false;
     }
 
