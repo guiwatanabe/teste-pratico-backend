@@ -36,7 +36,7 @@ class ProductPolicy
      */
     public function update(User $user, Product $product): bool
     {
-        return false;
+        return in_array($user->role, ['ADMIN', 'MANAGER', 'FINANCE']);
     }
 
     /**

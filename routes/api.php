@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,7 @@ Route::middleware('auth:sanctum')->prefix('users')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->prefix('products')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Api\ProductController::class, 'index'])->can('viewAny', App\Models\Product::class);
-    Route::post('/', [\App\Http\Controllers\Api\ProductController::class, 'store'])->can('create', App\Models\Product::class);
+    Route::get('/', [ProductController::class, 'index'])->can('viewAny', App\Models\Product::class);
+    Route::post('/', [ProductController::class, 'store'])->can('create', App\Models\Product::class);
+    Route::patch('/{product}', [ProductController::class, 'update'])->can('update', 'product');
 });
