@@ -1,20 +1,8 @@
 <?php
 
-function createUser($role = 'ADMIN')
-{
-    return \App\Models\User::factory()->create([
-        'role' => $role,
-    ]);
-}
-
-function createProducts($count = 3)
-{
-    return \App\Models\Product::factory()->count($count)->create();
-}
-
 test('returns product list for any authenticated user', function () {
     $user = createUser();
-    $products = createProducts();
+    $products = createProducts(3);
 
     $response = $this->actingAs($user)->getJson('/api/products');
 

@@ -1,12 +1,5 @@
 <?php
 
-function createUser($role = 'ADMIN')
-{
-    return \App\Models\User::factory()->create([
-        'role' => $role,
-    ]);
-}
-
 test('returns 401 for unauthenticated request', function () {
     $response = $this->postJson('/api/products', [
         'name' => 'Test Product',

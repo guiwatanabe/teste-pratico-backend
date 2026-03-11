@@ -1,17 +1,5 @@
 <?php
 
-function createProducts(int $count = 1)
-{
-    return \App\Models\Product::factory()->count($count)->create();
-}
-
-function createUser($role = 'ADMIN')
-{
-    return \App\Models\User::factory()->create([
-        'role' => $role,
-    ]);
-}
-
 test('returns 401 for unauthenticated request', function () {
     $response = $this->deleteJson('/api/products/1');
 

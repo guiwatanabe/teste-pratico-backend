@@ -4,22 +4,6 @@ use App\Models\Gateway;
 use App\Models\Transaction;
 use App\Models\User;
 
-function createUser($role = 'ADMIN')
-{
-    return User::factory()->create([
-        'role' => $role,
-    ]);
-}
-
-function createTransactions($count = 1)
-{
-    $gateway = Gateway::factory()->create();
-
-    return Transaction::factory()->count($count)->create([
-        'gateway_id' => $gateway->id,
-    ]);
-}
-
 test('returns 401 for unauthenticated request', function () {
     $response = $this->getJson('/api/transactions');
 

@@ -5,13 +5,6 @@ function createProduct()
     return \App\Models\Product::factory()->create();
 }
 
-function createUser($role = 'ADMIN')
-{
-    return \App\Models\User::factory()->create([
-        'role' => $role,
-    ]);
-}
-
 test('returns 401 for unauthenticated request', function () {
     $response = $this->patchJson('/api/products/1', [
         'name' => 'Updated Product',

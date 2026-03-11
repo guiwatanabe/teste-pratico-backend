@@ -2,18 +2,6 @@
 
 use App\Models\Client;
 
-function createUser($role = 'ADMIN')
-{
-    return \App\Models\User::factory()->create([
-        'role' => $role,
-    ]);
-}
-
-function createClients($count = 1)
-{
-    return Client::factory()->count($count)->create();
-}
-
 test('returns 401 for unauthenticated request', function () {
     $response = $this->getJson('/api/clients');
 

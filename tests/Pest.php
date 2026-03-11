@@ -41,7 +41,27 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function createUser(string $role = 'ADMIN'): \App\Models\User
 {
-    // ..
+    return \App\Models\User::factory()->create(['role' => $role]);
+}
+
+function createClients(int $count = 1): \Illuminate\Database\Eloquent\Collection
+{
+    return \App\Models\Client::factory()->count($count)->create();
+}
+
+function createTransactions(int $count = 1): \Illuminate\Database\Eloquent\Collection
+{
+    $gateway = \App\Models\Gateway::factory()->create();
+
+    return \App\Models\Transaction::factory()->count($count)->create([
+        'gateway_id' => $gateway->id,
+        'status' => 'completed',
+    ]);
+}
+
+function createProducts(int $count = 1): \Illuminate\Database\Eloquent\Collection
+{
+    return \App\Models\Product::factory()->count($count)->create();
 }

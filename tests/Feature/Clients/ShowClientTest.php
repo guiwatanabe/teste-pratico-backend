@@ -3,18 +3,6 @@
 use App\Models\Client;
 use App\Models\Product;
 
-function createUser($role = 'ADMIN')
-{
-    return \App\Models\User::factory()->create([
-        'role' => $role,
-    ]);
-}
-
-function createClients($count = 1)
-{
-    return Client::factory()->count($count)->create();
-}
-
 function createTransactionForClient(Client $client, $count = 1)
 {
     $gateway = \App\Models\Gateway::factory()->create();
