@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -22,4 +23,8 @@ Route::middleware('auth:sanctum')->prefix('products')->group(function () {
     Route::post('/', [ProductController::class, 'store'])->can('create', App\Models\Product::class);
     Route::patch('/{product}', [ProductController::class, 'update'])->can('update', 'product');
     Route::delete('/{product}', [ProductController::class, 'destroy'])->can('delete', 'product');
+});
+
+Route::middleware('auth:sanctum')->prefix('clients')->group(function () {
+    Route::get('/', [ClientController::class, 'index'])->can('viewAny', App\Models\Client::class);
 });
