@@ -23,6 +23,11 @@ class TransactionPolicy
         return true;
     }
 
+    public function refund(User $user, Transaction $transaction): bool
+    {
+        return in_array($user->role, ['ADMIN', 'FINANCE']);
+    }
+
     /**
      * Determine whether the user can create models.
      */

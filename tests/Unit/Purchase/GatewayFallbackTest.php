@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Gateway;
-use App\Services\GatewayFallbackService;
+use App\Services\PaymentService;
 use App\Services\Gateways\GatewayInterface;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 
@@ -16,7 +16,7 @@ beforeEach(function () {
     $chargeCalls = ['gateway_1' => 0, 'gateway_2' => 0];
     $this->chargeCalls = &$chargeCalls;
 
-    $this->gatewayFallbackService = new GatewayFallbackService([
+    $this->paymentService = new PaymentService([
         'gateway_1' => new class($shouldFail, $chargeCalls) implements GatewayInterface
         {
             private array $shouldFail;
@@ -98,7 +98,7 @@ test('uses the first prioritized gateway driver', function () {
         ['driver' => 'gateway_1', 'priority' => 0, 'is_active' => true]
     ))->make();
 
-    $result = $this->gatewayFallbackService->attempt(['amount' => 1000], $gateways);
+    $result = $this->paymentService->attempt(['amount' => 1000], $gateways);
 
     expect($result['gateway']->driver)->toBe('gateway_1');
     expect($this->chargeCalls['gateway_1'])->toBe(1);
@@ -111,7 +111,7 @@ test('skips inactive gateways and continues to the next', function () {
         ['driver' => 'gateway_2', 'priority' => 1, 'is_active' => true]
     ))->make();
 
-    $result = $this->gatewayFallbackService->attempt(['amount' => 1000], $gateways);
+    $result = $this->paymentService->attempt(['amount' => 1000], $gateways);
 
     expect($result['gateway']->driver)->toBe('gateway_2');
 });
@@ -124,7 +124,7 @@ test('tries the next gateway when the current one throws an exception', function
         ['driver' => 'gateway_2', 'priority' => 1, 'is_active' => true]
     ))->make();
 
-    $result = $this->gatewayFallbackService->attempt(['amount' => 1000], $gateways);
+    $result = $this->paymentService->attempt(['amount' => 1000], $gateways);
 
     expect($result['gateway']->driver)->toBe('gateway_2');
 });
@@ -137,7 +137,7 @@ test('stops and returns success as soon as one gateway succeeds', function () {
         ['driver' => 'gateway_2', 'priority' => 1, 'is_active' => true]
     ))->make();
 
-    $result = $this->gatewayFallbackService->attempt(['amount' => 1000], $gateways);
+    $result = $this->paymentService->attempt(['amount' => 1000], $gateways);
 
     expect($result['result']['status'])->toBe('success');
     expect($result['gateway']->driver)->toBe('gateway_1');
@@ -153,7 +153,7 @@ test('throws after exhausting all gateways', function () {
         ['driver' => 'gateway_2', 'priority' => 1, 'is_active' => true]
     ))->make();
 
-    $this->gatewayFallbackService->attempt(['amount' => 1000], $gateways);
+    $this->paymentService->attempt(['amount' => 1000], $gateways);
 })->throws(\RuntimeException::class, 'All gateways failed: Gateway 2 failed');
 
 test('handles an empty active gateway list gracefully', function () {
@@ -162,7 +162,7 @@ test('handles an empty active gateway list gracefully', function () {
         ['driver' => 'gateway_2', 'priority' => 1, 'is_active' => false]
     ))->make();
 
-    $this->gatewayFallbackService->attempt(['amount' => 1000], $gateways);
+    $this->paymentService->attempt(['amount' => 1000], $gateways);
 })->throws(\RuntimeException::class, 'No active gateways available.');
 
 test('throws when all active gateways have no registered driver', function () {
@@ -171,5 +171,5 @@ test('throws when all active gateways have no registered driver', function () {
         ['driver' => 'unknown_2', 'priority' => 1, 'is_active' => true]
     ))->make();
 
-    $this->gatewayFallbackService->attempt(['amount' => 1000], $gateways);
+    $this->paymentService->attempt(['amount' => 1000], $gateways);
 })->throws(\RuntimeException::class, 'All gateways failed');

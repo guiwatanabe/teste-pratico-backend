@@ -34,4 +34,5 @@ Route::middleware('auth:sanctum')->prefix('clients')->group(function () {
 Route::middleware('auth:sanctum')->prefix('transactions')->group(function () {
     Route::get('/', [TransactionController::class, 'index'])->can('viewAny', App\Models\Transaction::class);
     Route::get('/{transaction}', [TransactionController::class, 'show'])->can('view', 'transaction');
+    Route::post('/{transaction}/refund', [TransactionController::class, 'refund'])->can('refund', 'transaction');
 });
