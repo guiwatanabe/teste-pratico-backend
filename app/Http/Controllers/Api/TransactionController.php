@@ -12,4 +12,9 @@ class TransactionController extends Controller
     {
         return TransactionResource::collection(Transaction::paginate(10));
     }
+
+    public function show(Transaction $transaction)
+    {
+        return new TransactionResource($transaction->load('products'));
+    }
 }
