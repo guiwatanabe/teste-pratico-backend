@@ -15,3 +15,7 @@ Route::middleware('auth:sanctum')->prefix('users')->group(function () {
     Route::patch('/{user}', [UsersController::class, 'update'])->can('update', 'user');
     Route::delete('/{user}', [UsersController::class, 'delete'])->can('delete', 'user');
 });
+
+Route::middleware('auth:sanctum')->prefix('products')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\ProductController::class, 'index'])->can('viewAny', App\Models\Product::class);
+});
