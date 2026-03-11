@@ -9,9 +9,9 @@ Route::group(['prefix' => 'auth'], function () {
     Route::get('/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
 });
 
-Route::group(['prefix' => 'users'], function () {
-    Route::get('/', [UsersController::class, 'index'])->middleware('auth:sanctum')->can('viewAny', App\Models\User::class);
-    Route::post('/', [UsersController::class, 'store'])->middleware('auth:sanctum')->can('create', App\Models\User::class);
-    Route::patch('/{user}', [UsersController::class, 'update'])->middleware('auth:sanctum')->can('update', 'user');
-    Route::delete('/{user}', [UsersController::class, 'delete'])->middleware('auth:sanctum')->can('delete', 'user');
+Route::middleware('auth:sanctum')->group(['prefix' => 'users'], function () {
+    Route::get('/', [UsersController::class, 'index'])->can('viewAny', App\Models\User::class);
+    Route::post('/', [UsersController::class, 'store'])->can('create', App\Models\User::class);
+    Route::patch('/{user}', [UsersController::class, 'update'])->can('update', 'user');
+    Route::delete('/{user}', [UsersController::class, 'delete'])->can('delete', 'user');
 });
