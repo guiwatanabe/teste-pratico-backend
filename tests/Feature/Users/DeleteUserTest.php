@@ -59,7 +59,7 @@ test('prevents deleting own account', function () {
 test('returns 404 for a non-existent user', function () {
     $adminUser = \App\Models\User::factory()->create(['role' => 'ADMIN']);
 
-    $this->actingAs($adminUser)->deleteJson("/api/users/999999")->assertStatus(404);
+    $this->actingAs($adminUser)->deleteJson('/api/users/999999')->assertStatus(404);
 });
 
 test('returns 404 for a soft-deleted user', function () {

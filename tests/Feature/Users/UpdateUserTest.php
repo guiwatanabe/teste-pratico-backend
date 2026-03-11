@@ -58,7 +58,7 @@ test('returns 404 for non-existent or soft-deleted user', function () {
         'deleted_at' => now(),
     ]);
 
-    $this->actingAs($adminUser)->patchJson("/api/users/999999", [
+    $this->actingAs($adminUser)->patchJson('/api/users/999999', [
         'name' => 'Updated Name',
     ])->assertStatus(404);
 
@@ -102,7 +102,7 @@ test('persists the update to the database', function () {
     ])->assertStatus(200);
 
     $this->assertDatabaseHas('users', [
-        'id'   => $targetUser->id,
+        'id' => $targetUser->id,
         'name' => 'New Name',
     ]);
 });
