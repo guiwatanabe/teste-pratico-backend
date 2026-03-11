@@ -18,24 +18,24 @@ class PurchaseService
      */
     public function calculateTotal(Collection $products, array $requestedItems): Collection
     {
-        $collectItems = new Collection();
+        $collectItems = new Collection;
 
         foreach ($requestedItems as $item) {
             $product = $products->firstWhere('id', $item['id']);
 
-            if (!$product) {
+            if (! $product) {
                 throw new \InvalidArgumentException("Product ID {$item['id']} not found.");
             }
 
-            $unitPrice  = $product->amount;
+            $unitPrice = $product->amount;
             $totalPrice = $unitPrice * $item['quantity'];
 
             $collectItems->push(new TransactionProduct([
-                'product_id'   => $product->id,
+                'product_id' => $product->id,
                 'product_name' => $product->name,
-                'quantity'     => $item['quantity'],
-                'unit_price'   => $unitPrice,
-                'total_price'  => $totalPrice,
+                'quantity' => $item['quantity'],
+                'unit_price' => $unitPrice,
+                'total_price' => $totalPrice,
             ]));
         }
 

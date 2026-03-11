@@ -4,7 +4,7 @@ use App\Models\Product;
 use App\Services\PurchaseService;
 
 test('calculates total as unit_price multiplied by quantity for a single product', function () {
-    $service = new PurchaseService();
+    $service = new PurchaseService;
 
     $product = new Product(['name' => 'Test Product', 'amount' => 1000]);
     $product->id = 1;
@@ -22,7 +22,7 @@ test('calculates total as unit_price multiplied by quantity for a single product
 });
 
 test('sums correctly across multiple products with different quantities', function () {
-    $service = new PurchaseService();
+    $service = new PurchaseService;
 
     $product1 = new Product(['name' => 'Product 1', 'amount' => 500]);
     $product1->id = 1;
@@ -44,7 +44,7 @@ test('sums correctly across multiple products with different quantities', functi
 });
 
 test('returns the amount in cents', function () {
-    $service = new PurchaseService();
+    $service = new PurchaseService;
 
     $product = new Product(['name' => 'Test Product', 'amount' => 1234]);
     $product->id = 1;
@@ -61,7 +61,7 @@ test('returns the amount in cents', function () {
 });
 
 test('handles large quantities without floating point errors', function () {
-    $service = new PurchaseService();
+    $service = new PurchaseService;
 
     $product = new Product(['name' => 'Bulk Product', 'amount' => 999]);
     $product->id = 1;
@@ -78,7 +78,7 @@ test('handles large quantities without floating point errors', function () {
 });
 
 test('throws if a requested product id does not exist', function () {
-    $service = new PurchaseService();
+    $service = new PurchaseService;
 
     $product = new Product(['name' => 'Existing Product', 'amount' => 500]);
     $product->id = 1;
