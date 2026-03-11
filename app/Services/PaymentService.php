@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Gateway;
 use Illuminate\Support\Collection;
 
-class GatewayFallbackService
+class PaymentService
 {
     /**
      * @param  array<string, GatewayInterface>  $drivers
@@ -50,6 +50,6 @@ class GatewayFallbackService
             }
         }
 
-        throw new \RuntimeException('All gateways failed: '.$lastException?->getMessage());
+        throw new \RuntimeException('All gateways failed: ' . $lastException?->getMessage());
     }
 }

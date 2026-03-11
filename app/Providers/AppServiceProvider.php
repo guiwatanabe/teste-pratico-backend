@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\PaymentService;
+use App\Services\RefundService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +17,23 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(PaymentService::class, function () {
+            $drivers = [];
+            foreach (config('gateways.drivers') as $key => $config) {
+                $drivers[$key] = app($config['class']);
+            }
+
+            return new PaymentService($drivers);
+        });
+
+        $this->app->singleton(RefundService::class, function () {
+            $drivers = [];
+            foreach (config('gateways.drivers') as $key => $config) {
+                $drivers[$key] = app($config['class']);
+            }
+
+            return new RefundService($drivers);
+        });
     }
 
     /**
@@ -37,14 +55,15 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
+        Password::defaults(
+            fn(): ?Password => app()->isProduction()
+                ? Password::min(12)
                 ->mixedCase()
                 ->letters()
                 ->numbers()
                 ->symbols()
                 ->uncompromised()
-            : null,
+                : null,
         );
     }
 }
