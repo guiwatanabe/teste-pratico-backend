@@ -11,4 +11,5 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['prefix' => 'users'], function () {
     Route::get('/', [UsersController::class, 'index'])->middleware('auth:sanctum')->can('viewAny', App\Models\User::class);
+    Route::post('/', [UsersController::class, 'store'])->middleware('auth:sanctum')->can('create', App\Models\User::class);
 });
