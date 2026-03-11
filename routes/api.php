@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,8 @@ Route::middleware('auth:sanctum')->prefix('products')->group(function () {
 Route::middleware('auth:sanctum')->prefix('clients')->group(function () {
     Route::get('/', [ClientController::class, 'index'])->can('viewAny', App\Models\Client::class);
     Route::get('/{client}', [ClientController::class, 'show'])->can('view', 'client');
+});
+
+Route::middleware('auth:sanctum')->prefix('transactions')->group(function () {
+    Route::get('/', [TransactionController::class, 'index'])->can('viewAny', App\Models\Transaction::class);
 });
