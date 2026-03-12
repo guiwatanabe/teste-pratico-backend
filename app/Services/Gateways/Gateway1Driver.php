@@ -49,7 +49,7 @@ class Gateway1Driver implements GatewayInterface
     {
         $this->token = $this->getAuthToken();
 
-        $response = Http::withToken($this->token)->post("{$this->baseUrl}/transactions/{$payload['transactionId']}/refund");
+        $response = Http::withToken($this->token)->post("{$this->baseUrl}/transactions/{$payload['transactionId']}/charge_back");
 
         if (! $response->successful() || $response->status() !== 201) {
             throw new \Exception('Refund failed with Gateway 1: '.$response->body());

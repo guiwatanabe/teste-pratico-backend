@@ -2,6 +2,15 @@
 
 use Illuminate\Support\Facades\Http;
 
+function fakeGatewayRefund(): void
+{
+    Http::fake([
+        '*/login' => Http::response(['token' => 'fake-token'], 200),
+        '*/transactions/*/charge_back' => Http::response(['id' => 'abc'], 201),
+        '*/transacoes/reembolso' => Http::response(['id' => 'abc'], 201),
+    ]);
+}
+
 test('returns 401 for unauthenticated request', function () {
     $transaction = createTransactions()->first();
 
@@ -13,11 +22,7 @@ test('returns 401 for unauthenticated request', function () {
 });
 
 test('allows ADMIN and FINANCE to issue a refund', function () {
-    Http::fake([
-        '*/login' => Http::response(['token' => 'fake-token'], 200),
-        '*/transactions/*/refund' => Http::response(['id' => 'abc'], 201),
-        '*/transacoes/reembolso' => Http::response(['id' => 'abc'], 201),
-    ]);
+    fakeGatewayRefund();
 
     $admin = createUser('ADMIN');
     $finance = createUser('FINANCE');
@@ -108,11 +113,7 @@ test('calls the correct gateway refund API based on which gateway processed the 
 });
 
 test('updates transaction status to refunded on success', function () {
-    Http::fake([
-        '*/login' => Http::response(['token' => 'fake-token'], 200),
-        '*/transactions/*/refund' => Http::response(['id' => 'abc'], 201),
-        '*/transacoes/reembolso' => Http::response(['id' => 'abc'], 201),
-    ]);
+    fakeGatewayRefund();
 
     $admin = createUser('ADMIN');
     $transaction = createTransactions()->first();
