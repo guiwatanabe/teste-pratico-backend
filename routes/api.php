@@ -3,9 +3,12 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UsersController;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/purchase', PurchaseController::class);
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('/login', [AuthController::class, 'authenticate'])->middleware('throttle:5,1,api-login');
