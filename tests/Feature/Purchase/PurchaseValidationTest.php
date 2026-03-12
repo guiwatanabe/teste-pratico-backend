@@ -83,6 +83,57 @@ test('returns 422 when required card fields are missing or invalid', function ()
         ->assertJsonValidationErrors(['card.number', 'card.expiry', 'card.cvv']);
 });
 
+test('returns 422 when card expiry is in the past', function () {
+    $product = createProducts()->first();
+
+    $response = $this->postJson('/api/purchase', [
+        'products' => [
+            [
+                'id' => $product->id,
+                'quantity' => 1,
+            ],
+        ],
+        'buyer' => [
+            'name' => 'Test Client',
+            'email' => 'test.client@example.com',
+        ],
+        'card' => [
+            'number' => '5569000000006063',
+            'expiry' => '01/20',
+            'cvv' => '010',
+        ],
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['card.expiry']);
+});
+
+test('does not return card expiry error when expiry is in the future', function () {
+    $product = createProducts()->first();
+
+    $futureExpiry = now()->addYear()->format('m/y');
+
+    $response = $this->postJson('/api/purchase', [
+        'products' => [
+            [
+                'id' => $product->id,
+                'quantity' => 1,
+            ],
+        ],
+        'buyer' => [
+            'name' => 'Test Client',
+            'email' => 'test.client@example.com',
+        ],
+        'card' => [
+            'number' => '5569000000006063',
+            'expiry' => $futureExpiry,
+            'cvv' => '010',
+        ],
+    ]);
+
+    $response->assertJsonMissingValidationErrors(['card.expiry']);
+});
+
 test('returns 422 when product has no stock available', function () {
     $product = createProducts()->first();
     $product->update(['amount' => 0]);

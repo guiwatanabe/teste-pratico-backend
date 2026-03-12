@@ -44,6 +44,17 @@ class StorePurchaseRequest extends FormRequest
     {
         return [
             function (Validator $validator) {
+                $expiry = $this->input('card.expiry');
+                if ($expiry && preg_match('/^(0[1-9]|1[0-2])\/(\d{2})$/', $expiry, $matches)) {
+                    $month = (int) $matches[1];
+                    $year = 2000 + (int) $matches[2];
+                    $expiryDate = \Carbon\Carbon::create($year, $month, 1)->endOfMonth();
+
+                    if ($expiryDate->isPast()) {
+                        $validator->errors()->add('card.expiry', 'The card has expired.');
+                    }
+                }
+
                 foreach ($this->input('products', []) as $index => $item) {
                     $product = Product::find($item['id'] ?? null);
 
