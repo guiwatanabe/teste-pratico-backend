@@ -66,7 +66,7 @@ class PurchaseService
         ], $gateways);
 
         return DB::transaction(function () use ($result, $totalAmount, $lineItems, $data) {
-            $client = Client::firstOrCreate(
+            $client = Client::updateOrCreate(
                 ['email' => $data['buyer']['email']],
                 ['name' => $data['buyer']['name']]
             );
