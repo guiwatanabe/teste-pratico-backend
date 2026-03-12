@@ -29,6 +29,9 @@ class StorePurchaseRequest extends FormRequest
             'products.*.quantity' => ['required', 'integer', 'min:1'],
             'buyer.name' => ['required', 'string', 'max:255'],
             'buyer.email' => ['required', 'email', 'max:255'],
+            'card.number' => ['required', 'digits:16'],
+            'card.expiry' => ['required', 'regex:/^(0[1-9]|1[0-2])\/\d{2}$/'],
+            'card.cvv' => ['required', 'digits:3'],
         ];
     }
 

@@ -67,6 +67,22 @@ test('returns 422 when quantity is zero, negative, or non-integer', function () 
         ->assertJsonValidationErrors(['products.0.quantity']);
 });
 
+test('returns 422 when required card fields are missing or invalid', function () {
+    $response = $this->postJson('/api/purchase', [
+        'products' => [],
+        'buyer' => [
+            'name' => 'Test Client',
+            'email' => 'test.client@example.com',
+        ],
+        'card' => [
+            'number' => 'asdf',
+        ],
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['card.number', 'card.expiry', 'card.cvv']);
+});
+
 test('returns 422 when product has no stock available', function () {
     $product = createProducts()->first();
     $product->update(['amount' => 0]);
