@@ -1,12 +1,13 @@
 <?php
 
 use App\Models\Product;
+use App\Services\PaymentService;
 use App\Services\PurchaseService;
 
 test('calculates total as unit_price multiplied by quantity for a single product', function () {
-    $service = new PurchaseService;
+    $service = new PurchaseService(Mockery::mock(PaymentService::class));
 
-    $product = new Product(['name' => 'Test Product', 'amount' => 1000]);
+    $product = new Product(['name' => 'Test Product', 'price_cents' => 1000]);
     $product->id = 1;
 
     $products = collect([$product]);
@@ -22,12 +23,12 @@ test('calculates total as unit_price multiplied by quantity for a single product
 });
 
 test('sums correctly across multiple products with different quantities', function () {
-    $service = new PurchaseService;
+    $service = new PurchaseService(Mockery::mock(PaymentService::class));
 
-    $product1 = new Product(['name' => 'Product 1', 'amount' => 500]);
+    $product1 = new Product(['name' => 'Product 1', 'price_cents' => 500]);
     $product1->id = 1;
 
-    $product2 = new Product(['name' => 'Product 2', 'amount' => 2000]);
+    $product2 = new Product(['name' => 'Product 2', 'price_cents' => 2000]);
     $product2->id = 2;
 
     $products = collect([$product1, $product2]);
@@ -44,9 +45,9 @@ test('sums correctly across multiple products with different quantities', functi
 });
 
 test('returns the amount in cents', function () {
-    $service = new PurchaseService;
+    $service = new PurchaseService(Mockery::mock(PaymentService::class));
 
-    $product = new Product(['name' => 'Test Product', 'amount' => 1234]);
+    $product = new Product(['name' => 'Test Product', 'price_cents' => 1234]);
     $product->id = 1;
 
     $products = collect([$product]);
@@ -61,9 +62,9 @@ test('returns the amount in cents', function () {
 });
 
 test('handles large quantities without floating point errors', function () {
-    $service = new PurchaseService;
+    $service = new PurchaseService(Mockery::mock(PaymentService::class));
 
-    $product = new Product(['name' => 'Bulk Product', 'amount' => 999]);
+    $product = new Product(['name' => 'Bulk Product', 'price_cents' => 999]);
     $product->id = 1;
 
     $products = collect([$product]);
@@ -78,9 +79,9 @@ test('handles large quantities without floating point errors', function () {
 });
 
 test('throws if a requested product id does not exist', function () {
-    $service = new PurchaseService;
+    $service = new PurchaseService(Mockery::mock(PaymentService::class));
 
-    $product = new Product(['name' => 'Existing Product', 'amount' => 500]);
+    $product = new Product(['name' => 'Existing Product', 'price_cents' => 500]);
     $product->id = 1;
 
     $products = collect([$product]);

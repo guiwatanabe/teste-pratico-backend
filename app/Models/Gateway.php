@@ -24,6 +24,10 @@ class Gateway extends Model
         'priority',
     ];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);

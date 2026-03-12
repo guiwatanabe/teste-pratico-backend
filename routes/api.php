@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\GatewayController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\TransactionController;
@@ -38,4 +39,8 @@ Route::middleware('auth:sanctum')->prefix('transactions')->group(function () {
     Route::get('/', [TransactionController::class, 'index'])->can('viewAny', App\Models\Transaction::class);
     Route::get('/{transaction}', [TransactionController::class, 'show'])->can('view', 'transaction');
     Route::post('/{transaction}/refund', [TransactionController::class, 'refund'])->can('refund', 'transaction');
+});
+
+Route::middleware('auth:sanctum')->prefix('gateways')->group(function () {
+    Route::patch('/{gateway}', [GatewayController::class, 'update'])->can('manage', App\Models\Gateway::class);
 });
