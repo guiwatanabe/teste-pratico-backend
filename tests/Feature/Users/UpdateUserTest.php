@@ -106,3 +106,16 @@ test('persists the update to the database', function () {
         'name' => 'New Name',
     ]);
 });
+
+test('hashes and updates password when provided', function () {
+    $adminUser = \App\Models\User::factory()->create(['role' => 'ADMIN']);
+    $targetUser = \App\Models\User::factory()->create(['role' => 'USER']);
+
+    $this->actingAs($adminUser)->patchJson("/api/users/{$targetUser->id}", [
+        'password' => 'new_password',
+    ])->assertStatus(200);
+
+    $this->assertTrue(
+        \Illuminate\Support\Facades\Hash::check('new_password', $targetUser->fresh()->password)
+    );
+});

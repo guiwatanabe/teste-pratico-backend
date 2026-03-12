@@ -18,6 +18,7 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::middleware('auth:sanctum')->prefix('users')->group(function () {
     Route::get('/', [UsersController::class, 'index'])->can('viewAny', App\Models\User::class);
+    Route::get('/{user}', [UsersController::class, 'show'])->can('view', 'user');
     Route::post('/', [UsersController::class, 'store'])->can('create', App\Models\User::class);
     Route::patch('/{user}', [UsersController::class, 'update'])->can('update', 'user');
     Route::delete('/{user}', [UsersController::class, 'destroy'])->can('delete', 'user');
