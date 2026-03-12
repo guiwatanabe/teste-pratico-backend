@@ -135,6 +135,24 @@ test('links all purchased products with correct quantity and unit price in trans
     ]);
 });
 
+test('decrements product stock after a successful purchase', function () {
+    fakeGateways();
+
+    \App\Models\Gateway::factory()->create(['is_active' => true, 'priority' => 1]);
+    $product = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 1000]);
+
+    $this->postJson('/api/purchase', [
+        'products' => [['id' => $product->id, 'quantity' => 3]],
+        'buyer' => ['name' => 'Test Client', 'email' => 'test.client@example.com'],
+        'card' => testCard(),
+    ])->assertStatus(201);
+
+    $this->assertDatabaseHas('products', [
+        'id' => $product->id,
+        'amount' => 7,
+    ]);
+});
+
 test('calculates total correctly for multiple products with different quantities', function () {
     fakeGateways();
 
