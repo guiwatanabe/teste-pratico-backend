@@ -26,10 +26,10 @@ class Gateway2Driver implements GatewayInterface
         ])->post(
             "{$this->baseUrl}/transacoes",
             [
-                'amount' => $payload['amount'],
-                'name' => $payload['name'],
+                'valor' => $payload['amount'],
+                'nome' => $payload['name'],
                 'email' => $payload['email'],
-                'cardNumber' => $payload['cardNumber'],
+                'numeroCartao' => $payload['cardNumber'],
                 'cvv' => $payload['cvv'],
             ]
         );
