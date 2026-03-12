@@ -19,10 +19,6 @@ class RefundService
     {
         $gateway = $transaction->gateway;
 
-        if (! $gateway) {
-            throw new \RuntimeException('Transaction has no associated gateway.');
-        }
-
         $driver = $this->drivers[$gateway->driver] ?? null;
 
         if (! $driver) {

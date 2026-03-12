@@ -151,3 +151,17 @@ test('does NOT update transaction status if the gateway refund API fails', funct
     $response->assertStatus(502);
     expect($transaction->fresh()->status)->toBe('completed');
 });
+
+test('throws when gateway driver is not registered', function () {
+    $admin = createUser('ADMIN');
+    $transaction = createTransactions()->first();
+
+    app()->forgetInstance(\App\Services\RefundService::class);
+    app()->singleton(\App\Services\RefundService::class, fn () => new \App\Services\RefundService([]));
+
+    $response = $this->actingAs($admin)->postJson("/api/transactions/{$transaction->id}/refund", [
+        'reason' => 'Customer request.',
+    ]);
+
+    $response->assertStatus(502);
+});
