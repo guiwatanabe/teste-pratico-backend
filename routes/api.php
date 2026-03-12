@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->prefix('users')->group(function () {
 
 Route::middleware('auth:sanctum')->prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index'])->can('viewAny', App\Models\Product::class);
+    Route::get('/{product}', [ProductController::class, 'show'])->can('view', 'product');
     Route::post('/', [ProductController::class, 'store'])->can('create', App\Models\Product::class);
     Route::patch('/{product}', [ProductController::class, 'update'])->can('update', 'product');
     Route::delete('/{product}', [ProductController::class, 'destroy'])->can('delete', 'product');

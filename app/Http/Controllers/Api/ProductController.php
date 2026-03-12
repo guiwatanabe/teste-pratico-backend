@@ -15,6 +15,11 @@ class ProductController extends Controller
         return ProductResource::collection(Product::paginate(10));
     }
 
+    public function show(Product $product)
+    {
+        return new ProductResource($product);
+    }
+
     public function store(StoreProductRequest $request)
     {
         $data = $request->validated();
