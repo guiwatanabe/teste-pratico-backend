@@ -139,8 +139,8 @@ test('calculates total correctly for multiple products with different quantities
     fakeGateways();
 
     \App\Models\Gateway::factory()->create(['is_active' => true, 'priority' => 1]);
-    $product1 = \App\Models\Product::factory()->create(['price_cents' => 1200]);
-    $product2 = \App\Models\Product::factory()->create(['price_cents' => 3000]);
+    $product1 = \App\Models\Product::factory()->create(['amount' => 5, 'price_cents' => 1200]);
+    $product2 = \App\Models\Product::factory()->create(['amount'=> 5, 'price_cents' => 3000]);
 
     $response = $this->postJson('/api/purchase', [
         'products' => [

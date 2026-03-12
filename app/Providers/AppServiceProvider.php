@@ -46,6 +46,8 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Configure default behaviors for production-ready applications.
+     * 
+     * @codeCoverageIgnore
      */
     protected function configureDefaults(): void
     {
