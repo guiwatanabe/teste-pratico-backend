@@ -50,6 +50,6 @@ class PaymentService
             }
         }
 
-        throw new \RuntimeException('All gateways failed: ' . $lastException?->getMessage());
+        throw new \RuntimeException('All gateways failed: '.$lastException?->getMessage());
     }
 }

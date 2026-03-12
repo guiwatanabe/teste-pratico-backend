@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Client;
-
 test('returns 401 for unauthenticated request', function () {
     $response = $this->getJson('/api/clients');
 

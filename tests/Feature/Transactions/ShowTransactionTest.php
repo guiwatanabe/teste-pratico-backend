@@ -1,9 +1,5 @@
 <?php
 
-use App\Models\Gateway;
-use App\Models\Transaction;
-use App\Models\User;
-
 test('returns 401 for unauthenticated request', function () {
     $response = $this->getJson('/api/transactions/1');
 

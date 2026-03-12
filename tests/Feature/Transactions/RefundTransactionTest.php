@@ -1,8 +1,5 @@
 <?php
 
-use App\Models\Gateway;
-use App\Models\Transaction;
-use App\Models\User;
 use Illuminate\Support\Facades\Http;
 
 test('returns 401 for unauthenticated request', function () {
@@ -17,9 +14,9 @@ test('returns 401 for unauthenticated request', function () {
 
 test('allows ADMIN and FINANCE to issue a refund', function () {
     Http::fake([
-        '*/login'                 => Http::response(['token' => 'fake-token'], 200),
+        '*/login' => Http::response(['token' => 'fake-token'], 200),
         '*/transactions/*/refund' => Http::response(['id' => 'abc'], 201),
-        '*/transacoes/reembolso'  => Http::response(['id' => 'abc'], 201),
+        '*/transacoes/reembolso' => Http::response(['id' => 'abc'], 201),
     ]);
 
     $admin = createUser('ADMIN');
@@ -98,10 +95,9 @@ test('calls the correct gateway refund API based on which gateway processed the 
         ->andReturn(['success' => true]);
 
     app()->forgetInstance(\App\Services\RefundService::class);
-    app()->singleton(\App\Services\RefundService::class, fn () =>
-        new \App\Services\RefundService([
-            $transaction->gateway->driver => $driverMock,
-        ])
+    app()->singleton(\App\Services\RefundService::class, fn () => new \App\Services\RefundService([
+        $transaction->gateway->driver => $driverMock,
+    ])
     );
 
     $response = $this->actingAs($admin)->postJson("/api/transactions/{$transaction->id}/refund", [
@@ -113,9 +109,9 @@ test('calls the correct gateway refund API based on which gateway processed the 
 
 test('updates transaction status to refunded on success', function () {
     Http::fake([
-        '*/login'                 => Http::response(['token' => 'fake-token'], 200),
+        '*/login' => Http::response(['token' => 'fake-token'], 200),
         '*/transactions/*/refund' => Http::response(['id' => 'abc'], 201),
-        '*/transacoes/reembolso'  => Http::response(['id' => 'abc'], 201),
+        '*/transacoes/reembolso' => Http::response(['id' => 'abc'], 201),
     ]);
 
     $admin = createUser('ADMIN');
@@ -142,10 +138,9 @@ test('does NOT update transaction status if the gateway refund API fails', funct
         ->andThrow(new \RuntimeException('Refund failed'));
 
     app()->forgetInstance(\App\Services\RefundService::class);
-    app()->singleton(\App\Services\RefundService::class, fn () =>
-        new \App\Services\RefundService([
-            $transaction->gateway->driver => $driverMock,
-        ])
+    app()->singleton(\App\Services\RefundService::class, fn () => new \App\Services\RefundService([
+        $transaction->gateway->driver => $driverMock,
+    ])
     );
 
     $response = $this->actingAs($admin)->postJson("/api/transactions/{$transaction->id}/refund", [

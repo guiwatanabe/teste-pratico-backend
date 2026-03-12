@@ -14,9 +14,6 @@ class RefundService
     /**
      * Attempts a refund at the available gateways, throwing an exception
      * if the refund fails or if the transaction has no associated gateway.
-     *
-     * @param Transaction $transaction
-     * @return array
      */
     public function attemptRefund(Transaction $transaction): array
     {
@@ -39,7 +36,7 @@ class RefundService
 
             return ['gateway' => $gateway, 'result' => $result];
         } catch (\Throwable $e) {
-            throw new \RuntimeException('Refund failed: ' . $e->getMessage());
+            throw new \RuntimeException('Refund failed: '.$e->getMessage());
         }
     }
 }

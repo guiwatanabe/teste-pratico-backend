@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\Gateway;
-use App\Services\PaymentService;
 use App\Services\Gateways\GatewayInterface;
+use App\Services\PaymentService;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 
 beforeEach(function () {
