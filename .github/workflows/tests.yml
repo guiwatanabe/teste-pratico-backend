@@ -33,16 +33,16 @@ jobs:
           tools: composer:v2
           coverage: xdebug
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+#      - name: Setup Node
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: '22'
 
-      - name: Install Node Dependencies
-        run: npm i
+#      - name: Install Node Dependencies
+#        run: npm i
 
-      - name: Add Flux Credentials Loaded From ENV
-        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
+#      - name: Add Flux Credentials Loaded From ENV
+#        run: composer config http-basic.composer.fluxui.dev "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}"
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -53,8 +53,18 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
-      - name: Build Assets
-        run: npm run build
+#      - name: Build Assets
+#        run: npm run build
+
+      - name: Start Gateway Mocks
+        run: docker run -d -p 3001:3001 -p 3002:3002 matheusprotzen/gateways-mock
 
       - name: Run Tests
+        env:
+          GATEWAY_1_BASE_URL: ${{ vars.GATEWAY_1_BASE_URL }}
+          GATEWAY_1_AUTH_EMAIL: ${{ secrets.GATEWAY_1_AUTH_EMAIL }}
+          GATEWAY_1_AUTH_TOKEN: ${{ secrets.GATEWAY_1_AUTH_TOKEN }}
+          GATEWAY_2_BASE_URL: ${{ vars.GATEWAY_2_BASE_URL }}
+          GATEWAY_2_HEADER_TOKEN: ${{ secrets.GATEWAY_2_HEADER_TOKEN }}
+          GATEWAY_2_HEADER_SECRET: ${{ secrets.GATEWAY_2_HEADER_SECRET }}
         run: ./vendor/bin/pest
