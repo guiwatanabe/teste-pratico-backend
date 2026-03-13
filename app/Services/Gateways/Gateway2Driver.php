@@ -4,7 +4,7 @@ namespace App\Services\Gateways;
 
 use Illuminate\Support\Facades\Http;
 
-class Gateway2Driver implements GatewayInterface
+class Gateway2Driver extends AbstractGatewayDriver
 {
     private $baseUrl;
 
@@ -12,29 +12,50 @@ class Gateway2Driver implements GatewayInterface
 
     private $headerSecret;
 
-    public function __construct()
+    public static function driverName(): string
     {
-        $this->loadConfiguration();
+        return 'gateway_2';
+    }
+
+    protected function loadConfiguration(): void
+    {
+        $driverName = static::driverName();
+        $this->baseUrl = config("gateways.drivers.{$driverName}.base_url");
+        $this->headerToken = config("gateways.drivers.{$driverName}.header_token");
+        $this->headerSecret = config("gateways.drivers.{$driverName}.header_secret");
+        $authType = config("gateways.drivers.{$driverName}.auth_type");
+
+        if (! $this->baseUrl || ! $this->headerToken || ! $this->headerSecret || ! $authType || $authType !== 'header') {
+            throw new \Exception('Gateway 2 is not properly configured');
+        }
     }
 
     public function charge(array $payload): array
     {
-        $response = Http::withHeaders([
-            'Gateway-Auth-Token' => $this->headerToken,
-            'Gateway-Auth-Secret' => $this->headerSecret,
-            'Content-Type' => 'application/json',
-        ])->post(
-            "{$this->baseUrl}/transacoes",
-            [
-                'valor' => $payload['amount'],
-                'nome' => $payload['name'],
-                'email' => $payload['email'],
-                'numeroCartao' => $payload['cardNumber'],
-                'cvv' => $payload['cvv'],
-            ]
+        $url = "{$this->baseUrl}/transacoes";
+        $headers = $this->getHeaders();
+        $payload = [
+            'valor' => $payload['amount'],
+            'nome' => $payload['name'],
+            'email' => $payload['email'],
+            'numeroCartao' => $payload['cardNumber'],
+            'cvv' => $payload['cvv'],
+        ];
+
+        $response = Http::withHeaders($headers)->post($url, $payload);
+
+        $this->log(
+            'charge',
+            'POST',
+            $url,
+            $this->sanitizeFields($headers, ['Gateway-Auth-Token', 'Gateway-Auth-Secret']),
+            json_encode($this->sanitizeFields($payload, ['numeroCartao', 'cvv'])),
+            $response->headers(),
+            $response->body(),
+            $response->status()
         );
 
-        if (! $response->successful() || $response->status() !== 201) {
+        if ($response->status() !== 201) {
             throw new \Exception('Payment failed with Gateway 2: '.$response->body());
         }
 
@@ -47,15 +68,26 @@ class Gateway2Driver implements GatewayInterface
 
     public function refund(array $payload): array
     {
-        $response = Http::withHeaders([
-            'Gateway-Auth-Token' => $this->headerToken,
-            'Gateway-Auth-Secret' => $this->headerSecret,
-            'Content-Type' => 'application/json',
-        ])->post("{$this->baseUrl}/transacoes/reembolso", [
+        $url = "{$this->baseUrl}/transacoes/reembolso";
+        $headers = $this->getHeaders();
+        $payload = [
             'id' => $payload['transactionId'],
-        ]);
+        ];
 
-        if (! $response->successful() || $response->status() !== 201) {
+        $response = Http::withHeaders($headers)->post($url, $payload);
+
+        $this->log(
+            'refund',
+            'POST',
+            $url,
+            $this->sanitizeFields($headers, ['Gateway-Auth-Token', 'Gateway-Auth-Secret']),
+            json_encode($payload),
+            $response->headers(),
+            $response->body(),
+            $response->status()
+        );
+
+        if ($response->status() !== 201) {
             throw new \Exception('Refund failed with Gateway 2: '.$response->body());
         }
 
@@ -68,11 +100,21 @@ class Gateway2Driver implements GatewayInterface
 
     public function listTransactions(): array
     {
-        $response = Http::withHeaders([
-            'Gateway-Auth-Token' => $this->headerToken,
-            'Gateway-Auth-Secret' => $this->headerSecret,
-            'Content-Type' => 'application/json',
-        ])->get("{$this->baseUrl}/transacoes");
+        $url = "{$this->baseUrl}/transacoes";
+        $headers = $this->getHeaders();
+
+        $response = Http::withHeaders($headers)->get($url);
+
+        $this->log(
+            'list_transactions',
+            'GET',
+            $url,
+            $this->sanitizeFields($headers, ['Gateway-Auth-Token', 'Gateway-Auth-Secret']),
+            null,
+            $response->headers(),
+            $response->body(),
+            $response->status()
+        );
 
         if (! $response->successful()) {
             throw new \Exception('Failed to list transactions with Gateway 2: '.$response->body());
@@ -85,15 +127,12 @@ class Gateway2Driver implements GatewayInterface
         ];
     }
 
-    private function loadConfiguration(): void
+    private function getHeaders(): array
     {
-        $this->baseUrl = config('gateways.drivers.gateway_2.base_url');
-        $this->headerToken = config('gateways.drivers.gateway_2.header_token');
-        $this->headerSecret = config('gateways.drivers.gateway_2.header_secret');
-        $authType = config('gateways.drivers.gateway_2.auth_type');
-
-        if (! $this->baseUrl || ! $this->headerToken || ! $this->headerSecret || ! $authType || $authType !== 'header') {
-            throw new \RuntimeException('Gateway 2 is not properly configured');
-        }
+        return [
+            'Gateway-Auth-Token' => $this->headerToken,
+            'Gateway-Auth-Secret' => $this->headerSecret,
+            'Content-Type' => 'application/json',
+        ];
     }
 }

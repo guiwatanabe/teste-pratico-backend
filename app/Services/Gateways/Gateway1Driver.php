@@ -4,7 +4,7 @@ namespace App\Services\Gateways;
 
 use Illuminate\Support\Facades\Http;
 
-class Gateway1Driver implements GatewayInterface
+class Gateway1Driver extends AbstractGatewayDriver
 {
     private $baseUrl;
 
@@ -12,29 +12,50 @@ class Gateway1Driver implements GatewayInterface
 
     private $authToken;
 
-    private $token;
-
-    public function __construct()
+    public static function driverName(): string
     {
-        $this->loadConfiguration();
+        return 'gateway_1';
+    }
+
+    protected function loadConfiguration(): void
+    {
+        $driverName = static::driverName();
+        $this->baseUrl = config("gateways.drivers.{$driverName}.base_url");
+        $this->authEmail = config("gateways.drivers.{$driverName}.auth_email");
+        $this->authToken = config("gateways.drivers.{$driverName}.auth_token");
+        $authType = config("gateways.drivers.{$driverName}.auth_type");
+
+        if (! $this->baseUrl || ! $this->authEmail || ! $this->authToken || ! $authType || $authType !== 'auth_token') {
+            throw new \Exception('Gateway 1 is not properly configured');
+        }
     }
 
     public function charge(array $payload): array
     {
-        $this->token = $this->getAuthToken();
+        $token = $this->getAuthToken();
+        $url = "{$this->baseUrl}/transactions";
+        $payload = [
+            'amount' => $payload['amount'],
+            'name' => $payload['name'],
+            'email' => $payload['email'],
+            'cardNumber' => $payload['cardNumber'],
+            'cvv' => $payload['cvv'],
+        ];
 
-        $response = Http::withToken($this->token)->post(
-            "{$this->baseUrl}/transactions",
-            [
-                'amount' => $payload['amount'],
-                'name' => $payload['name'],
-                'email' => $payload['email'],
-                'cardNumber' => $payload['cardNumber'],
-                'cvv' => $payload['cvv'],
-            ]
+        $response = Http::withToken($token)->post($url, $payload);
+
+        $this->log(
+            'charge',
+            'POST',
+            $url,
+            ['Authorization' => 'Bearer *****'],
+            json_encode($this->sanitizeFields($payload, ['cardNumber', 'cvv'])),
+            $response->headers(),
+            $response->body(),
+            $response->status()
         );
 
-        if (! $response->successful() || $response->status() !== 201) {
+        if ($response->status() !== 201) {
             throw new \Exception('Payment failed with Gateway 1: '.$response->body());
         }
 
@@ -47,11 +68,23 @@ class Gateway1Driver implements GatewayInterface
 
     public function refund(array $payload): array
     {
-        $this->token = $this->getAuthToken();
+        $token = $this->getAuthToken();
+        $url = "{$this->baseUrl}/transactions/{$payload['transactionId']}/charge_back";
 
-        $response = Http::withToken($this->token)->post("{$this->baseUrl}/transactions/{$payload['transactionId']}/charge_back");
+        $response = Http::withToken($token)->post($url);
 
-        if (! $response->successful() || $response->status() !== 201) {
+        $this->log(
+            'refund',
+            'POST',
+            $url,
+            ['Authorization' => 'Bearer *****'],
+            null,
+            $response->headers(),
+            $response->body(),
+            $response->status()
+        );
+
+        if ($response->status() !== 201) {
             throw new \Exception('Refund failed with Gateway 1: '.$response->body());
         }
 
@@ -64,9 +97,21 @@ class Gateway1Driver implements GatewayInterface
 
     public function listTransactions(): array
     {
-        $this->token = $this->getAuthToken();
+        $token = $this->getAuthToken();
+        $url = "{$this->baseUrl}/transactions";
 
-        $response = Http::withToken($this->token)->get("{$this->baseUrl}/transactions");
+        $response = Http::withToken($token)->get($url);
+
+        $this->log(
+            'list_transactions',
+            'GET',
+            $url,
+            ['Authorization' => 'Bearer *****'],
+            null,
+            $response->headers(),
+            $response->body(),
+            $response->status()
+        );
 
         if (! $response->successful()) {
             throw new \Exception('Failed to retrieve transactions from Gateway 1: '.$response->body());
@@ -79,24 +124,30 @@ class Gateway1Driver implements GatewayInterface
         ];
     }
 
-    private function loadConfiguration(): void
-    {
-        $this->baseUrl = config('gateways.drivers.gateway_1.base_url');
-        $this->authEmail = config('gateways.drivers.gateway_1.auth_email');
-        $this->authToken = config('gateways.drivers.gateway_1.auth_token');
-        $authType = config('gateways.drivers.gateway_1.auth_type');
-
-        if (! $this->baseUrl || ! $this->authEmail || ! $this->authToken || ! $authType || $authType !== 'auth_token') {
-            throw new \Exception('Gateway 1 is not properly configured');
-        }
-    }
-
     private function getAuthToken(): string
     {
-        $response = Http::post("{$this->baseUrl}/login", [
+        $url = "{$this->baseUrl}/login";
+        $payload = [
             'email' => $this->authEmail,
             'token' => $this->authToken,
-        ]);
+        ];
+        $response = Http::post($url, $payload);
+
+        $responseData = json_decode($response->body(), true);
+        $responseBody = is_array($responseData)
+            ? json_encode($this->sanitizeFields($responseData, ['token']))
+            : $response->body();
+
+        $this->log(
+            'authenticate',
+            'POST',
+            $url,
+            [],
+            json_encode($this->sanitizeFields($payload, ['token'])),
+            $response->headers(),
+            $responseBody,
+            $response->status()
+        );
 
         if ($response->successful()) {
             return $response->json('token');
