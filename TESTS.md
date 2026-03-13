@@ -257,6 +257,7 @@ tests/
 - charge throws on 200 response (not 201) ✓
 - refund returns success data on 201 ✓
 - refund throws on non-201 response ✓
+- refund throws Transaction not found when statusCode is 404 in body ✓
 - listTransactions returns success data ✓
 - listTransactions throws on non-2xx response ✓
 
@@ -267,7 +268,10 @@ tests/
 - charge returns success data on 201 ✓
 - charge throws on non-201 response ✓
 - charge throws on 200 response (not 201) ✓
+- charge surfaces card decline message from erros array ✓
+- charge hides validation error details when erros has rule field ✓
 - refund returns success data on 201 ✓
 - refund throws on non-201 response ✓
+- refund throws Invalid transaction ID on uuid rule error ✓
 - listTransactions returns success data ✓
 - listTransactions throws on non-2xx response ✓

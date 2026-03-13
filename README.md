@@ -160,6 +160,7 @@ Para autorização (RBAC), vou utilizar *Policies*, que irão controlar o acesso
 > ### Importante:
 >
 > Idealmente, esse endpoint implementaria idempotência, para prevenir requests/cobranças duplicadas que podem vir a acontecer. Não implementei essa funcionalidade, mas é necessária a implementação para sistemas em produção.
+> 
 
 | Método | Endpoint    | Auth | Descrição          |
 | ---    | ---         | ---  | ---                |
@@ -173,11 +174,43 @@ Para autorização (RBAC), vou utilizar *Policies*, que irão controlar o acesso
     "email": "test@example.com"
   },
   "card": {
-    "number": "111222333444",
+    "number": "1111222233334444",
     "expiry": "12/26",
     "cvv": "123"
   },
   "products": [{ "id": 1, "quantity": 2 }]
+}
+```
+
+**Response `201` (transação efetuada)**
+```json
+{
+    "id": 1,
+    "external_id": "32a9f7c9-4195-410b-91d8-9af83dbef374",
+    "status": "completed",
+    "amount": 80898,
+    "card_last_numbers": "4444",
+    "gateway": "Gateway 1",
+    "products": [
+        {
+            "id": 1,
+            "name": "illo",
+            "quantity": 2,
+            "unit_price": 40449,
+            "total_price": 80898
+        }
+    ],
+    "buyer": {
+        "name": "Cliente Teste",
+        "email": "test@example.com"
+    }
+}
+```
+
+**Response `502` (erro)**
+```json
+{
+    "message": "All gateways failed: _MOTIVO_"
 }
 ```
 
