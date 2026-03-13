@@ -58,10 +58,10 @@ class StorePurchaseRequest extends FormRequest
                 foreach ($this->input('products', []) as $index => $item) {
                     $product = Product::find($item['id'] ?? null);
 
-                    if ($product && $product->amount < ($item['quantity'] ?? 0)) {
+                    if ($product && $product->stock < ($item['quantity'] ?? 0)) {
                         $validator->errors()->add(
                             "products.{$index}.quantity",
-                            "Insufficient stock for product '{$product->name}'. Available: {$product->amount}."
+                            "Insufficient stock for product '{$product->name}'. Available: {$product->stock}."
                         );
                     }
                 }

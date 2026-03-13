@@ -10,7 +10,7 @@ test('returns product list for any authenticated user', function () {
         ->assertJsonCount(3, 'data')
         ->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'name', 'amount', 'price', 'created_at', 'updated_at'],
+                '*' => ['id', 'name', 'stock', 'price', 'created_at', 'updated_at'],
             ],
             'meta' => ['total', 'per_page', 'current_page', 'last_page'],
             'links',

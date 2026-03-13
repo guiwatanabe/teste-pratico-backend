@@ -54,7 +54,7 @@ test('transaction entries include product details', function () {
     $user = createUser('USER');
     $client = createClients()->first();
     $transaction = createTransactionForClient($client)->first();
-    $product = Product::factory()->create(['amount' => 5000]);
+    $product = Product::factory()->create(['stock' => 5000]);
 
     $transaction->products()->create([
         'product_id' => $product->id,

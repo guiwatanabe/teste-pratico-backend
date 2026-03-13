@@ -23,7 +23,7 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'amount' => 'sometimes|required|integer|min:0',
+            'stock' => 'sometimes|required|integer|min:0',
             'price_cents' => 'sometimes|required|integer|min:0',
         ];
     }

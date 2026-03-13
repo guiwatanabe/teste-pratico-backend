@@ -84,7 +84,7 @@ class PurchaseService
 
             foreach ($data['products'] as $item) {
                 Product::where('id', $item['id'])->lockForUpdate()->first();
-                Product::where('id', $item['id'])->decrement('amount', $item['quantity']);
+                Product::where('id', $item['id'])->decrement('stock', $item['quantity']);
             }
 
             return $transaction;

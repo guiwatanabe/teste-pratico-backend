@@ -26,7 +26,7 @@ class ProductController extends Controller
 
         $product = Product::create([
             'name' => $data['name'],
-            'amount' => $data['amount'],
+            'stock' => $data['stock'],
             'price_cents' => $data['price_cents'],
         ]);
 

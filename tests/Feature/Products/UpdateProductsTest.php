@@ -8,7 +8,7 @@ function createProduct()
 test('returns 401 for unauthenticated request', function () {
     $response = $this->patchJson('/api/products/1', [
         'name' => 'Updated Product',
-        'amount' => 20,
+        'stock' => 20,
         'price_cents' => 2000,
     ]);
 
@@ -23,7 +23,7 @@ test('allows ADMIN, MANAGER, and FINANCE to update a product', function () {
 
     $responseAdmin = $this->actingAs($adminUser)->patchJson("/api/products/{$product->id}", [
         'name' => 'Updated Product',
-        'amount' => 20,
+        'stock' => 20,
         'price_cents' => 2000,
     ]);
 
@@ -31,7 +31,7 @@ test('allows ADMIN, MANAGER, and FINANCE to update a product', function () {
 
     $responseManager = $this->actingAs($managerUser)->patchJson("/api/products/{$product->id}", [
         'name' => 'Updated Product 1',
-        'amount' => 20,
+        'stock' => 20,
         'price_cents' => 2000,
     ]);
 
@@ -39,7 +39,7 @@ test('allows ADMIN, MANAGER, and FINANCE to update a product', function () {
 
     $responseFinance = $this->actingAs($financeUser)->patchJson("/api/products/{$product->id}", [
         'name' => 'Updated Product 2',
-        'amount' => 20,
+        'stock' => 20,
         'price_cents' => 2000,
     ]);
 
@@ -52,7 +52,7 @@ test('prevents USER from updating products', function () {
 
     $response = $this->actingAs($user)->patchJson("/api/products/{$product->id}", [
         'name' => 'Updated Product',
-        'amount' => 20,
+        'stock' => 20,
         'price_cents' => 2000,
     ]);
 
@@ -64,7 +64,7 @@ test('returns 404 for non-existent or soft-deleted product', function () {
 
     $response = $this->actingAs($adminUser)->patchJson('/api/products/9999', [
         'name' => 'Updated Product',
-        'amount' => 20,
+        'stock' => 20,
         'price_cents' => 2000,
     ]);
 
@@ -77,10 +77,10 @@ test('returns 422 on invalid payload', function () {
 
     $response = $this->actingAs($adminUser)->patchJson("/api/products/{$product->id}", [
         'name' => '',
-        'amount' => -5,
+        'stock' => -5,
         'price_cents' => -1000,
     ]);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['name', 'amount', 'price_cents']);
+        ->assertJsonValidationErrors(['name', 'stock', 'price_cents']);
 });

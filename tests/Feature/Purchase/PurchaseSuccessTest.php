@@ -89,10 +89,10 @@ test('links all purchased products with correct quantity and unit price in trans
     fakeGateways();
 
     \App\Models\Gateway::factory()->create(['is_active' => true, 'priority' => 1]);
-    $product1 = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 1500]);
-    $product2 = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 2500]);
-    $product3 = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 1000]);
-    $product4 = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 2000]);
+    $product1 = \App\Models\Product::factory()->create(['stock' => 10, 'price_cents' => 1500]);
+    $product2 = \App\Models\Product::factory()->create(['stock' => 10, 'price_cents' => 2500]);
+    $product3 = \App\Models\Product::factory()->create(['stock' => 10, 'price_cents' => 1000]);
+    $product4 = \App\Models\Product::factory()->create(['stock' => 10, 'price_cents' => 2000]);
 
     $response = $this->postJson('/api/purchase', [
         'products' => [
@@ -139,7 +139,7 @@ test('decrements product stock after a successful purchase', function () {
     fakeGateways();
 
     \App\Models\Gateway::factory()->create(['is_active' => true, 'priority' => 1]);
-    $product = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 1000]);
+    $product = \App\Models\Product::factory()->create(['stock' => 10, 'price_cents' => 1000]);
 
     $this->postJson('/api/purchase', [
         'products' => [['id' => $product->id, 'quantity' => 3]],
@@ -149,7 +149,7 @@ test('decrements product stock after a successful purchase', function () {
 
     $this->assertDatabaseHas('products', [
         'id' => $product->id,
-        'amount' => 7,
+        'stock' => 7,
     ]);
 });
 
@@ -157,8 +157,8 @@ test('calculates total correctly for multiple products with different quantities
     fakeGateways();
 
     \App\Models\Gateway::factory()->create(['is_active' => true, 'priority' => 1]);
-    $product1 = \App\Models\Product::factory()->create(['amount' => 5, 'price_cents' => 1200]);
-    $product2 = \App\Models\Product::factory()->create(['amount' => 5, 'price_cents' => 3000]);
+    $product1 = \App\Models\Product::factory()->create(['stock' => 5, 'price_cents' => 1200]);
+    $product2 = \App\Models\Product::factory()->create(['stock' => 5, 'price_cents' => 3000]);
 
     $response = $this->postJson('/api/purchase', [
         'products' => [

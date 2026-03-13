@@ -27,7 +27,7 @@ test('returns product details for authenticated user', function () {
             'data' => [
                 'id',
                 'name',
-                'amount',
+                'stock',
                 'price',
                 'created_at',
                 'updated_at',
@@ -37,7 +37,7 @@ test('returns product details for authenticated user', function () {
             'data' => [
                 'id' => $product->id,
                 'name' => $product->name,
-                'amount' => $product->amount,
+                'stock' => $product->stock,
                 'price' => $product->price_cents,
                 'created_at' => $product->created_at->toISOString(),
                 'updated_at' => $product->updated_at->toISOString(),

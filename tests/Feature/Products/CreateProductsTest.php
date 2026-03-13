@@ -3,7 +3,7 @@
 test('returns 401 for unauthenticated request', function () {
     $response = $this->postJson('/api/products', [
         'name' => 'Test Product',
-        'amount' => 10,
+        'stock' => 10,
         'price_cents' => 1000,
     ]);
 
@@ -17,19 +17,19 @@ test('allows ADMIN, MANAGER, and FINANCE to create a product', function () {
 
     $responseAdmin = $this->actingAs($adminUser)->postJson('/api/products', [
         'name' => 'Test Product',
-        'amount' => 10,
+        'stock' => 10,
         'price_cents' => 1000,
     ]);
 
     $responseManager = $this->actingAs($managerUser)->postJson('/api/products', [
         'name' => 'Test Product',
-        'amount' => 10,
+        'stock' => 10,
         'price_cents' => 1000,
     ]);
 
     $responseFinance = $this->actingAs($financeUser)->postJson('/api/products', [
         'name' => 'Test Product',
-        'amount' => 10,
+        'stock' => 10,
         'price_cents' => 1000,
     ]);
 
@@ -43,7 +43,7 @@ test('prevents USER from creating products', function () {
 
     $response = $this->actingAs($user)->postJson('/api/products', [
         'name' => 'Test Product',
-        'amount' => 10,
+        'stock' => 10,
         'price_cents' => 1000,
     ]);
 
@@ -55,10 +55,10 @@ test('returns 422 on invalid payload', function () {
 
     $response = $this->actingAs($adminUser)->postJson('/api/products', [
         'name' => '',
-        'amount' => -5,
+        'stock' => -5,
         'price_cents' => -1000,
     ]);
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['name', 'amount', 'price_cents']);
+        ->assertJsonValidationErrors(['name', 'stock', 'price_cents']);
 });

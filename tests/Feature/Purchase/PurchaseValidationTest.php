@@ -136,7 +136,7 @@ test('does not return card expiry error when expiry is in the future', function 
 
 test('returns 422 when product has no stock available', function () {
     $product = createProducts()->first();
-    $product->update(['amount' => 0]);
+    $product->update(['stock' => 0]);
 
     $response = $this->postJson('/api/purchase', [
         'products' => [
