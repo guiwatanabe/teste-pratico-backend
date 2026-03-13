@@ -1,0 +1,60 @@
+networks:
+  laravel:
+    driver: bridge
+
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+    container_name: api
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./:/var/www/app
+    ports:
+      - "8000:8000"
+    depends_on: 
+      mysql:
+        condition: service_healthy
+    command:
+      - php artisan serve --host=0.0.0.0 --port 8000
+    networks:
+      - laravel
+
+  gateways:
+    image: 'matheusprotzen/gateways-mock:latest'
+    container_name: gateways
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    networks:
+      - laravel
+
+  mysql:
+    platform: linux/amd64
+    image: 'mysql/mysql-server:8.0'
+    container_name: mysql
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE:-laravel}"
+      MYSQL_USER: "${DB_USERNAME:-laravel}"
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_PASSWORD: "${DB_PASSWORD:-laravel}"
+      MYSQL_ROOT_HOST: "%"
+    networks:
+      - laravel
+    healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-p${DB_PASSWORD:-laravel}"]
+        retries: 3
+        timeout: 5s
+
+volumes:
+  mysql-data:
