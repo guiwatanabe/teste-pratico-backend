@@ -89,10 +89,10 @@ test('links all purchased products with correct quantity and unit price in trans
     fakeGateways();
 
     \App\Models\Gateway::factory()->create(['is_active' => true, 'priority' => 1]);
-    $product1 = \App\Models\Product::factory()->create(['price_cents' => 1500]);
-    $product2 = \App\Models\Product::factory()->create(['price_cents' => 2500]);
-    $product3 = \App\Models\Product::factory()->create(['price_cents' => 1000]);
-    $product4 = \App\Models\Product::factory()->create(['price_cents' => 2000]);
+    $product1 = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 1500]);
+    $product2 = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 2500]);
+    $product3 = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 1000]);
+    $product4 = \App\Models\Product::factory()->create(['amount' => 10, 'price_cents' => 2000]);
 
     $response = $this->postJson('/api/purchase', [
         'products' => [
@@ -158,7 +158,7 @@ test('calculates total correctly for multiple products with different quantities
 
     \App\Models\Gateway::factory()->create(['is_active' => true, 'priority' => 1]);
     $product1 = \App\Models\Product::factory()->create(['amount' => 5, 'price_cents' => 1200]);
-    $product2 = \App\Models\Product::factory()->create(['amount'=> 5, 'price_cents' => 3000]);
+    $product2 = \App\Models\Product::factory()->create(['amount' => 5, 'price_cents' => 3000]);
 
     $response = $this->postJson('/api/purchase', [
         'products' => [

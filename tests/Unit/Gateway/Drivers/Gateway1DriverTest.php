@@ -5,10 +5,10 @@ use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     config([
-        'gateways.drivers.gateway_1.base_url'    => 'http://gateway1.test',
-        'gateways.drivers.gateway_1.auth_type'   => 'auth_token',
-        'gateways.drivers.gateway_1.auth_email'  => 'test@gateway1.test',
-        'gateways.drivers.gateway_1.auth_token'  => 'ABCDEF123456',
+        'gateways.drivers.gateway_1.base_url' => 'http://gateway1.test',
+        'gateways.drivers.gateway_1.auth_type' => 'auth_token',
+        'gateways.drivers.gateway_1.auth_email' => 'test@gateway1.test',
+        'gateways.drivers.gateway_1.auth_token' => 'ABCDEF123456',
     ]);
 });
 
@@ -22,11 +22,11 @@ function gateway1WithAuth(): Gateway1Driver
 }
 
 $payload = [
-    'amount'     => 1000,
-    'name'       => 'Test Client',
-    'email'      => 'test.client@example.com',
+    'amount' => 1000,
+    'name' => 'Test Client',
+    'email' => 'test.client@example.com',
     'cardNumber' => '1111222233334444',
-    'cvv'        => '123',
+    'cvv' => '123',
 ];
 
 // --------------------
@@ -45,6 +45,19 @@ test('throws when gateway 1 auth_type is wrong', function () {
 
 // --------------------
 // getAuthToken
+test('throws when gateway 1 login returns non-JSON body', function () {
+    Http::fake([
+        'http://gateway1.test/login' => Http::response('Service Unavailable', 503),
+        'http://gateway1.test/transactions' => Http::response(['id' => '1'], 201),
+    ]);
+
+    $driver = new Gateway1Driver;
+
+    expect(fn () => $driver->charge([
+        'amount' => 1000, 'name' => 'Test Client', 'email' => 'test.client@example.com', 'cardNumber' => '1111222233334444', 'cvv' => '123',
+    ]))->toThrow(\Exception::class, 'Failed to retrieve authentication token from Gateway 1');
+});
+
 test('throws when gateway 1 login returns non-2xx', function () {
     Http::fake([
         'http://gateway1.test/login' => Http::response([], 401),
@@ -55,7 +68,7 @@ test('throws when gateway 1 login returns non-2xx', function () {
     $driver = new Gateway1Driver;
 
     Http::fake([
-        'http://gateway1.test/login'        => Http::response([], 401),
+        'http://gateway1.test/login' => Http::response([], 401),
         'http://gateway1.test/transactions' => Http::response(['id' => '1'], 201),
     ]);
 
@@ -68,7 +81,7 @@ test('throws when gateway 1 login returns non-2xx', function () {
 // charge
 test('charge returns success data on 201', function () use ($payload) {
     Http::fake([
-        'http://gateway1.test/login'        => Http::response(['token' => 'fake-bearer'], 200),
+        'http://gateway1.test/login' => Http::response(['token' => 'fake-bearer'], 200),
         'http://gateway1.test/transactions' => Http::response(['id' => 'ext-123', 'status' => 'paid'], 201),
     ]);
 
@@ -82,7 +95,7 @@ test('charge returns success data on 201', function () use ($payload) {
 
 test('charge throws on non-201 response', function () use ($payload) {
     Http::fake([
-        'http://gateway1.test/login'        => Http::response(['token' => 'fake-bearer'], 200),
+        'http://gateway1.test/login' => Http::response(['token' => 'fake-bearer'], 200),
         'http://gateway1.test/transactions' => Http::response(['error' => 'card declined'], 422),
     ]);
 
@@ -94,7 +107,7 @@ test('charge throws on non-201 response', function () use ($payload) {
 
 test('charge throws on 200 response (not 201)', function () use ($payload) {
     Http::fake([
-        'http://gateway1.test/login'        => Http::response(['token' => 'fake-bearer'], 200),
+        'http://gateway1.test/login' => Http::response(['token' => 'fake-bearer'], 200),
         'http://gateway1.test/transactions' => Http::response(['id' => 'ext-123'], 200),
     ]);
 
@@ -108,8 +121,8 @@ test('charge throws on 200 response (not 201)', function () use ($payload) {
 // refund
 test('refund returns success data on 201', function () {
     Http::fake([
-        'http://gateway1.test/login'                              => Http::response(['token' => 'fake-bearer'], 200),
-        'http://gateway1.test/transactions/ext-123/charge_back'  => Http::response(['status' => 'refunded'], 201),
+        'http://gateway1.test/login' => Http::response(['token' => 'fake-bearer'], 200),
+        'http://gateway1.test/transactions/ext-123/charge_back' => Http::response(['status' => 'refunded'], 201),
     ]);
 
     $driver = new Gateway1Driver;
@@ -121,8 +134,8 @@ test('refund returns success data on 201', function () {
 
 test('refund throws on non-201 response', function () {
     Http::fake([
-        'http://gateway1.test/login'                              => Http::response(['token' => 'fake-bearer'], 200),
-        'http://gateway1.test/transactions/ext-123/charge_back'  => Http::response([], 500),
+        'http://gateway1.test/login' => Http::response(['token' => 'fake-bearer'], 200),
+        'http://gateway1.test/transactions/ext-123/charge_back' => Http::response([], 500),
     ]);
 
     $driver = new Gateway1Driver;
@@ -135,7 +148,7 @@ test('refund throws on non-201 response', function () {
 // listTransactions
 test('listTransactions returns success data', function () {
     Http::fake([
-        'http://gateway1.test/login'        => Http::response(['token' => 'fake-bearer'], 200),
+        'http://gateway1.test/login' => Http::response(['token' => 'fake-bearer'], 200),
         'http://gateway1.test/transactions' => Http::response([['id' => 'ext-1']], 200),
     ]);
 
@@ -148,7 +161,7 @@ test('listTransactions returns success data', function () {
 
 test('listTransactions throws on non-2xx response', function () {
     Http::fake([
-        'http://gateway1.test/login'        => Http::response(['token' => 'fake-bearer'], 200),
+        'http://gateway1.test/login' => Http::response(['token' => 'fake-bearer'], 200),
         'http://gateway1.test/transactions' => Http::response([], 503),
     ]);
 

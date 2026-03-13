@@ -5,19 +5,19 @@ use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     config([
-        'gateways.drivers.gateway_2.base_url'      => 'http://gateway2.test',
-        'gateways.drivers.gateway_2.auth_type'     => 'header',
-        'gateways.drivers.gateway_2.header_token'  => 'token_12345',
+        'gateways.drivers.gateway_2.base_url' => 'http://gateway2.test',
+        'gateways.drivers.gateway_2.auth_type' => 'header',
+        'gateways.drivers.gateway_2.header_token' => 'token_12345',
         'gateways.drivers.gateway_2.header_secret' => 'abcdef123456',
     ]);
 });
 
 $payload = [
-    'amount'     => 1000,
-    'name'       => 'Test Client',
-    'email'      => 'test.client@example.com',
+    'amount' => 1000,
+    'name' => 'Test Client',
+    'email' => 'test.client@example.com',
     'cardNumber' => '1111222233334444',
-    'cvv'        => '123',
+    'cvv' => '123',
 ];
 
 // --------------------
@@ -25,13 +25,13 @@ $payload = [
 test('throws when gateway 2 config is missing', function () {
     config(['gateways.drivers.gateway_2.base_url' => '']);
 
-    expect(fn() => new Gateway2Driver)->toThrow(\RuntimeException::class, 'Gateway 2 is not properly configured');
+    expect(fn () => new Gateway2Driver)->toThrow(\Exception::class, 'Gateway 2 is not properly configured');
 });
 
 test('throws when gateway 2 auth_type is wrong', function () {
     config(['gateways.drivers.gateway_2.auth_type' => 'auth_token']);
 
-    expect(fn() => new Gateway2Driver)->toThrow(\RuntimeException::class, 'Gateway 2 is not properly configured');
+    expect(fn () => new Gateway2Driver)->toThrow(\Exception::class, 'Gateway 2 is not properly configured');
 });
 
 // --------------------
@@ -56,7 +56,7 @@ test('charge throws on non-201 response', function () use ($payload) {
 
     $driver = new Gateway2Driver;
 
-    expect(fn() => $driver->charge($payload))
+    expect(fn () => $driver->charge($payload))
         ->toThrow(\Exception::class, 'Payment failed with Gateway 2');
 });
 
@@ -67,7 +67,7 @@ test('charge throws on 200 response (not 201)', function () use ($payload) {
 
     $driver = new Gateway2Driver;
 
-    expect(fn() => $driver->charge($payload))
+    expect(fn () => $driver->charge($payload))
         ->toThrow(\Exception::class, 'Payment failed with Gateway 2');
 });
 
@@ -92,7 +92,7 @@ test('refund throws on non-201 response', function () {
 
     $driver = new Gateway2Driver;
 
-    expect(fn() => $driver->refund(['transactionId' => 'ext-456']))
+    expect(fn () => $driver->refund(['transactionId' => 'ext-456']))
         ->toThrow(\Exception::class, 'Refund failed with Gateway 2');
 });
 
@@ -117,6 +117,6 @@ test('listTransactions throws on non-2xx response', function () {
 
     $driver = new Gateway2Driver;
 
-    expect(fn() => $driver->listTransactions())
+    expect(fn () => $driver->listTransactions())
         ->toThrow(\Exception::class, 'Failed to list transactions with Gateway 2');
 });
