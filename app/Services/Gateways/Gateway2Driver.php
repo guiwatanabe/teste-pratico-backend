@@ -56,7 +56,11 @@ class Gateway2Driver extends AbstractGatewayDriver
         );
 
         if ($response->status() !== 201) {
-            throw new \Exception('Payment failed with Gateway 2: '.$response->body());
+            $error = $response->json('erros.0');
+            $message = isset($error['rule'])
+                ? 'Payment failed with Gateway 2'
+                : ($error['message'] ?? 'Payment failed with Gateway 2');
+            throw new \Exception($message);
         }
 
         return [
@@ -88,7 +92,11 @@ class Gateway2Driver extends AbstractGatewayDriver
         );
 
         if ($response->status() !== 201) {
-            throw new \Exception('Refund failed with Gateway 2: '.$response->body());
+            $error = $response->json('erros.0');
+            $message = (isset($error['rule']) && $error['rule'] === 'uuid')
+                ? 'Invalid transaction ID.'
+                : ($error['message'] ?? 'Refund failed with Gateway 2');
+            throw new \Exception($message);
         }
 
         return [

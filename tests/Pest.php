@@ -63,5 +63,5 @@ function createTransactions(int $count = 1): \Illuminate\Database\Eloquent\Colle
 
 function createProducts(int $count = 1): \Illuminate\Database\Eloquent\Collection
 {
-    return \App\Models\Product::factory()->count($count)->create();
+    return \App\Models\Product::factory()->count($count)->create(['amount' => 999]);
 }

@@ -54,7 +54,11 @@ test('throws when gateway 1 login returns non-JSON body', function () {
     $driver = new Gateway1Driver;
 
     expect(fn () => $driver->charge([
-        'amount' => 1000, 'name' => 'Test Client', 'email' => 'test.client@example.com', 'cardNumber' => '1111222233334444', 'cvv' => '123',
+        'amount' => 1000,
+        'name' => 'Test Client',
+        'email' => 'test.client@example.com',
+        'cardNumber' => '1111222233334444',
+        'cvv' => '123',
     ]))->toThrow(\Exception::class, 'Failed to retrieve authentication token from Gateway 1');
 });
 
@@ -73,7 +77,11 @@ test('throws when gateway 1 login returns non-2xx', function () {
     ]);
 
     expect(fn () => $driver->charge([
-        'amount' => 1000, 'name' => 'Test Client', 'email' => 'test.client@example.com', 'cardNumber' => '1111222233334444', 'cvv' => '123',
+        'amount' => 1000,
+        'name' => 'Test Client',
+        'email' => 'test.client@example.com',
+        'cardNumber' => '1111222233334444',
+        'cvv' => '123',
     ]))->toThrow(\Exception::class, 'Failed to retrieve authentication token from Gateway 1');
 });
 
@@ -102,7 +110,7 @@ test('charge throws on non-201 response', function () use ($payload) {
     $driver = new Gateway1Driver;
 
     expect(fn () => $driver->charge($payload))
-        ->toThrow(\Exception::class, 'Payment failed with Gateway 1');
+        ->toThrow(\Exception::class, 'card declined');
 });
 
 test('charge throws on 200 response (not 201)', function () use ($payload) {
@@ -142,6 +150,21 @@ test('refund throws on non-201 response', function () {
 
     expect(fn () => $driver->refund(['transactionId' => 'ext-123']))
         ->toThrow(\Exception::class, 'Refund failed with Gateway 1');
+});
+
+test('refund throws Transaction not found when statusCode is 404 in body', function () {
+    Http::fake([
+        'http://gateway1.test/login' => Http::response(['token' => 'fake-bearer'], 200),
+        'http://gateway1.test/transactions/ext-123/charge_back' => Http::response([
+            'error' => 'Route Not Found',
+            'statusCode' => 404,
+        ], 200),
+    ]);
+
+    $driver = new Gateway1Driver;
+
+    expect(fn () => $driver->refund(['transactionId' => 'ext-123']))
+        ->toThrow(\Exception::class, 'Transaction not found');
 });
 
 // --------------------

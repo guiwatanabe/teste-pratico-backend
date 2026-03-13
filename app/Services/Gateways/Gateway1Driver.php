@@ -56,7 +56,8 @@ class Gateway1Driver extends AbstractGatewayDriver
         );
 
         if ($response->status() !== 201) {
-            throw new \Exception('Payment failed with Gateway 1: '.$response->body());
+            $message = $response->json('error') ?? 'Payment failed with Gateway 1';
+            throw new \Exception($message);
         }
 
         return [
@@ -85,7 +86,13 @@ class Gateway1Driver extends AbstractGatewayDriver
         );
 
         if ($response->status() !== 201) {
-            throw new \Exception('Refund failed with Gateway 1: '.$response->body());
+            $message = 'Refund failed with Gateway 1';
+            if ($response->json('statusCode') === 404) {
+                $message = 'Transaction not found';
+            } else {
+                $message = $response->json('error') ?? $message;
+            }
+            throw new \Exception($message);
         }
 
         return [

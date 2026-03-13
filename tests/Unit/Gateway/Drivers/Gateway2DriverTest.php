@@ -71,6 +71,34 @@ test('charge throws on 200 response (not 201)', function () use ($payload) {
         ->toThrow(\Exception::class, 'Payment failed with Gateway 2');
 });
 
+test('charge surfaces card decline message from erros array', function () use ($payload) {
+    Http::fake([
+        'http://gateway2.test/transacoes' => Http::response([
+            'erros' => [['message' => 'contate a central do seu cartão']],
+            'statusCode' => 400,
+        ], 200),
+    ]);
+
+    $driver = new Gateway2Driver;
+
+    expect(fn () => $driver->charge($payload))
+        ->toThrow(\Exception::class, 'contate a central do seu cartão');
+});
+
+test('charge hides validation error details when erros has rule field', function () use ($payload) {
+    Http::fake([
+        'http://gateway2.test/transacoes' => Http::response([
+            'erros' => [['message' => 'The valor field must be positive', 'rule' => 'positive', 'field' => 'valor']],
+            'statusCode' => 400,
+        ], 200),
+    ]);
+
+    $driver = new Gateway2Driver;
+
+    expect(fn () => $driver->charge($payload))
+        ->toThrow(\Exception::class, 'Payment failed with Gateway 2');
+});
+
 // --------------------
 // refund
 test('refund returns success data on 201', function () {
@@ -94,6 +122,20 @@ test('refund throws on non-201 response', function () {
 
     expect(fn () => $driver->refund(['transactionId' => 'ext-456']))
         ->toThrow(\Exception::class, 'Refund failed with Gateway 2');
+});
+
+test('refund throws Invalid transaction ID on uuid rule error', function () {
+    Http::fake([
+        'http://gateway2.test/transacoes/reembolso' => Http::response([
+            'erros' => [['message' => 'The id field must be a valid UUID', 'rule' => 'uuid', 'field' => 'id']],
+            'statusCode' => 400,
+        ], 200),
+    ]);
+
+    $driver = new Gateway2Driver;
+
+    expect(fn () => $driver->refund(['transactionId' => 'not-a-uuid']))
+        ->toThrow(\Exception::class, 'Invalid transaction ID.');
 });
 
 // --------------------
