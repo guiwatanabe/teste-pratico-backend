@@ -1,15 +1,15 @@
-## Requisitos
+## 📋 Requisitos
 
 - Docker
 - GNU make (Windows: Git Bash ou WSL)
 
-## Portas
+## 🔌 Portas
 
 - *api* - **8000**
 - *mysql* - **3306**
 - *gateways* - **3001**, **3002**
 
-## Rodando o projeto
+## 🚀 Rodando o projeto
 
 ```bash
 git clone https://github.com/guiwatanabe/teste-pratico-backend.git
@@ -38,12 +38,12 @@ make setup
 | MANAGER | manager@example.com | password |
 | FINANCE | finance@example.com | password |
 
-## Rodando testes:
+## 🧪 Rodando testes:
 ```bash
 make test
 ```
 
-## Outros comandos
+## 🔧 Outros comandos
 | Comando       | Descrição                             | 
 | ---           | ---                                   |
 | `make up`     | Iniciar containers                    |
@@ -55,7 +55,7 @@ make test
 
 ---
 
-## Etapas do Desenvolvimento
+## 🛠️ Etapas do Desenvolvimento
 
 ## Modelagem dos dados 
 Como foi dada a especificação, vou começar criando as tabelas, models e relationships.
@@ -69,7 +69,7 @@ Como foi dada a especificação, vou começar criando as tabelas, models e relat
 | transaction_products | Produtos por transação  |
 | transactions         | Transações              |
 
-## Gateways
+## 💳 Gateways
 
 O sistema de gateways foi estruturado da seguinte forma:
 
@@ -94,7 +94,7 @@ interface GatewayInterface {
 
 ---
 
-### Adicionando um novo gateway
+### ➕ Adicionando um novo gateway
 > Exemplo: gateway_3
 1. Criar uma classe (`app/Services/Gateways/Gateway3Driver.php`) que estende `AbstractGatewayDriver`, implementando:
    - `driverName(): string` - retorna o identificador do driver (ex: `'gateway_3'`).
@@ -107,7 +107,7 @@ interface GatewayInterface {
 4. Inserir um registro na tabela `gateways` (`driver = gateway_3`), e configurar prioridade.
 
 
-## TDD
+## ✔️ TDD
 
 Escolhi seguir a abordagem do TDD para desenvolvimento do projeto, e segui o ciclo clássico: **Red > Green > Refactor**.
 
@@ -125,12 +125,12 @@ Grupos de testes:
 >
 > Informações dos testes - [📖 TESTS.md](/TESTS.md).
 
-## Autenticação e Autorização
+## 🔐 Autenticação e Autorização
 O projeto utilizará a biblioteca padrão do Laravel para *autenticação* - **Laravel Sanctum**. 
 
 Para autorização (RBAC), vou utilizar *Policies*, que irão controlar o acesso através do campo **role** do usuário autenticado através do token.
 
-## Rotas - API
+## 🌐 Rotas - API
 
 ### Auth
 
