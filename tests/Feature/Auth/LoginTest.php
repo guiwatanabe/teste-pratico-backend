@@ -1,9 +1,11 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 
 beforeEach(function () {
+    Cache::flush();
     $this->password = 'test_password';
     $this->user = User::factory()->create([
         'email' => 'test@example.com',
